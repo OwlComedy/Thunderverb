@@ -1,0 +1,348 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>COOKIE EMPIRE :: Y2K EDITION</title>
+    <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet">
+    <style>
+        /* === Y2K GLOBAL STYLES === */
+        :root {
+            --pink: #ff9ff3;
+            --hotpink: #ff6b9d;
+            --purple: #cc99ff;
+            --blue: #8bd3ff;
+            --scanline: rgba(255, 255, 255, 0.05);
+        }
+
+        body {
+            background: linear-gradient(135deg, var(--pink), var(--purple));
+            font-family: 'Press Start 2P', cursive;
+            color: white;
+            margin: 0;
+            overflow-x: hidden;
+            /* Updated Y2K Pixelated Cursor */
+            cursor: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 32 32"><path d="M8,8 L24,16 L16,16 L16,24 L8,8" fill="white" stroke="%23000000" stroke-width="1"/></svg>'), auto;
+        }
+
+        /* CRT EFFECT */
+        body::after {
+            content: "";
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: linear-gradient(
+                rgba(18, 16, 16, 0) 50%, 
+                var(--scanline) 50%
+            );
+            background-size: 100% 4px;
+            pointer-events: none;
+            z-index: 100;
+        }
+
+        /* NAVIGATION */
+        nav {
+            display: flex;
+            justify-content: center;
+            padding: 20px;
+            background: rgba(255, 255, 255, 0.2);
+            backdrop-filter: blur(5px);
+        }
+
+        nav button {
+            background: var(--hotpink);
+            border: 3px outset white;
+            color: white;
+            padding: 8px 16px;
+            margin: 0 10px;
+            font-family: 'Press Start 2P', cursive;
+            font-size: 14px;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        nav button:hover {
+            background: var(--purple);
+            transform: scale(1.1);
+        }
+
+        /* MAIN CONTENT AREA */
+        #app {
+            min-height: 70vh;
+            padding: 30px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        /* COOKIE STYLES */
+        .cookie {
+            background: rgba(255, 255, 255, 0.3);
+            border-radius: 20px;
+            padding: 20px;
+            margin: 20px auto;
+            max-width: 500px;
+            backdrop-filter: blur(5px);
+            border: 3px dotted white;
+        }
+
+        /* SPINNING STAR EFFECT */
+        .sparkle {
+            position: absolute;
+            width: 30px; /* Adjusted size */
+            height: 30px;
+            background: yellow;
+            clip-path: polygon(50% 0%, 61% 35%, 98% 35%, 68% 57%, 79% 91%, 50% 70%, 21% 91%, 32% 57%, 2% 35%, 39% 35%);
+            pointer-events: none;
+            z-index: 90;
+            animation: sparkleSpin 1.5s linear, sparkleFade 1.5s forwards; /* Adjusted duration */
+        }
+
+        @keyframes sparkleSpin {
+            0% {
+                transform: rotate(0deg);
+            }
+            100% {
+                transform: rotate(720deg); /* Changed from 360 to 720 degrees */
+            }
+        }
+
+        @keyframes sparkleFade {
+            0% {
+                opacity: 1;
+                transform: scale(1);
+            }
+            100% {
+                opacity: 0;
+                transform: scale(0.5);
+            }
+        }
+
+        /* Green Gradient Effect */
+        .cursor-gradient {
+            position: absolute;
+            width: 100px; /* Smaller size */
+            height: 100px;
+            background: radial-gradient(circle, rgba(184, 255, 184, 0.2) 0%, rgba(184, 255, 184, 0) 80%);
+            pointer-events: none;
+            transform: translate(-50%, -50%);
+            z-index: -1; /* Lowest layer */
+            animation: fadeOut 1.5s forwards;
+        }
+
+        @keyframes fadeOut {
+            0% {
+                opacity: 1;
+            }
+            100% {
+                opacity: 0;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- NAVIGATION -->
+    <nav>
+        <button onclick="loadPage('home')">HOME</button>
+        <button onclick="loadPage('store')">COOKIE STORE</button>
+        <button onclick="loadPage('buyers')">BUYERS LIST</button>
+        <button onclick="loadPage('love')">LOVE LETTERS</button>
+        <button onclick="loadPage('secret')">SECRET</button>
+    </nav>
+
+    <!-- MAIN CONTENT AREA -->
+    <div id="app">
+        <!-- Content loads here dynamically -->
+    </div>
+
+    <!-- PAGE TRANSITION ELEMENT -->
+    <div class="page-transition" id="transition"></div>
+
+    <!-- AUDIO ELEMENTS (Y2K SOUNDS) -->
+    <audio id="hoverSound" src="https://assets.mixkit.co/sfx/preview/mixkit-arcade-game-jump-coin-216.mp3"></audio>
+    <audio id="clickSound" src="https://assets.mixkit.co/sfx/preview/mixkit-quick-jump-arcade-game-239.mp3"></audio>
+
+    <script>
+        // ======================
+        // Y2K COOKIE EMPIRE SPA
+        // ======================
+
+        // ----- GLOBALS -----
+        let currentPage = 'home';
+        const transition = document.getElementById('transition');
+        const hoverSound = document.getElementById('hoverSound');
+        const clickSound = document.getElementById('clickSound');
+
+        // ----- GREEN GRADIENT EFFECT -----
+        function setupCursorGradient() {
+            document.addEventListener('mousemove', (e) => {
+                const gradient = document.createElement('div');
+                gradient.className = 'cursor-gradient';
+                gradient.style.left = `${e.pageX}px`;
+                gradient.style.top = `${e.pageY}px`;
+                document.body.appendChild(gradient);
+
+                // Remove the gradient after animation ends
+                setTimeout(() => gradient.remove(), 1500);
+            });
+        }
+
+        // ----- INITIAL LOAD -----
+        document.addEventListener('DOMContentLoaded', () => {
+            loadPage('home');
+            setupCursorGradient(); // Initialize green gradient effect
+            setupSparkles(); // Initialize spinning star sparkles
+            setupButtonSounds();
+        });
+
+        // ----- PAGE LOADER -----
+        function loadPage(page) {
+            // Play transition animation
+            transition.style.animation = 'none';
+            void transition.offsetWidth; // Trigger reflow
+            transition.style.animation = 'pageTransition 1s ease-in-out';
+            
+            // Load new content after delay
+            setTimeout(() => {
+                currentPage = page;
+                const app = document.getElementById('app');
+                
+                switch(page) {
+                    case 'home':
+                        app.innerHTML = `
+                            <div class="cookie">
+                                <h1 style="font-size: 3em;">🍪 COOKIE EMPIRE 🍪</h1>
+                                <p>WELCOME TO THE Y2K COOKIE EXPERIENCE</p>
+                                <marquee behavior="scroll" direction="left">
+                                    NEW COOKIES EVERY DAY • FREE SHIPPING • 100% VIRTUAL • NEW COOKIES EVERY DAY
+                                </marquee>
+                            </div>
+                            <div style="margin-top: 50px;">
+                                <img src="https://media.giphy.com/media/3o7abKhOpu0NwenH3O/giphy.gif" width="200">
+                            </div>
+                        `;
+                        break;
+                        
+                    case 'store':
+                        app.innerHTML = `
+                            <div class="cookie">
+                                <h2>VIRTUAL COOKIE STORE</h2>
+                                <div style="display: flex; flex-wrap: wrap; justify-content: center;">
+                                    <div style="margin: 10px; text-align: center;">
+                                        <img src="https://media1.giphy.com/media/LOQyoLIojnizS949is/giphy.gif" width="100">
+                                        <p>GLITCH COOKIE</p>
+                                        <button class="buy-btn" data-price="2.00">BUY $2.00</button>
+                                    </div>
+                                    <div style="margin: 10px; text-align: center;">
+                                        <img src="https://media4.giphy.com/media/SqmkZ5IdwzTP2/giphy.gif" width="100">
+                                        <p>DANCING COOKIE</p>
+                                        <button class="buy-btn" data-price="3.00">BUY $3.00</button>
+                                    </div>
+                                    <div style="margin: 10px; text-align: center;">
+                                        <img src="https://media0.giphy.com/media/dZXzmKGKNiJtDxuwGg/giphy.gif" width="100">
+                                        <p>RAINBOW COOKIE</p>
+                                        <button class="buy-btn" data-price="4.00">BUY $4.00</button>
+                                    </div>
+                                    <div style="margin: 10px; text-align: center;">
+                                        <img src="https://media2.giphy.com/media/KzWAhzWD3HrJyAcLEM/giphy.gif" width="100">
+                                        <p>PIXEL COOKIE</p>
+                                        <button class="buy-btn" data-price="5.00">BUY $5.00</button>
+                                    </div>
+                                    <div style="margin: 10px; text-align: center;">
+                                        <img src="https://media3.giphy.com/media/MEgGD8bV72hfq/giphy.gif" width="100">
+                                        <p>VAPORWAVE COOKIE</p>
+                                        <button class="buy-btn" data-price="6.00">BUY $6.00</button>
+                                    </div>
+                                    <div style="margin: 10px; text-align: center;">
+                                        <img src="https://media2.giphy.com/media/LqgrRiLbCwrCcopc79/giphy.gif" width="100">
+                                        <p>GLOWING COOKIE</p>
+                                        <button class="buy-btn" data-price="7.00">BUY $7.00</button>
+                                    </div>
+                                </div>
+                                <div id="cart" style="margin-top: 20px; font-size: 1.5em;">
+                                    CART: $0.00
+                                </div>
+                            </div>
+                        `;
+                        setupStore();
+                        break;
+                        
+                    case 'buyers':
+                        app.innerHTML = `
+                            <div class="cookie">
+                                <h2>TOP BUYERS</h2>
+                                <ol id="buyersList" style="text-align: left; font-size: 1.2em;">
+                                    <li>COOKIE_FAN_99</li>
+                                    <li>Y2K_LOVER</li>
+                                    <li>PINK_DREAM</li>
+                                </ol>
+                                <input type="text" id="newBuyer" placeholder="YOUR NAME">
+                                <button onclick="addBuyer()">ADD ME!</button>
+                            </div>
+                        `;
+                        break;
+                        
+                    case 'love':
+                        app.innerHTML = `
+                            <div class="cookie">
+                                <h2>LOVE LETTERS TO COOKIES</h2>
+                                <div id="typewriter" style="min-height: 100px; border: 2px dashed white; padding: 20px;"></div>
+                                <button onclick="startTypewriter()" style="margin-top: 20px;">WRITE LOVE LETTER</button>
+                            </div>
+                        `;
+                        break;
+                        
+                    case 'secret':
+                        app.innerHTML = `
+                            <div class="cookie">
+                                <h2>SECRET CONSOLE</h2>
+                                <div style="background: black; color: lime; font-family: monospace; padding: 20px; text-align: left;">
+                                    <div id="consoleOutput"></div>
+                                    <input type="text" id="consoleInput" style="width: 80%; background: black; color: lime; border: 1px solid lime; font-family: monospace;">
+                                </div>
+                                <p>TYPE "HELP" FOR COMMANDS</p>
+                            </div>
+                        `;
+                        setupConsole();
+                        break;
+                }
+            }, 500);
+        }
+
+        // ----- SPARKLE EFFECT -----
+        function setupSparkles() {
+            let lastSpawnTime = 0;
+            document.addEventListener('mousemove', (e) => {
+                const now = Date.now();
+                if (now - lastSpawnTime < 300) return; // Spawn stars more frequently
+                lastSpawnTime = now;
+
+                const sparkle = document.createElement('div');
+                sparkle.className = 'sparkle';
+                sparkle.style.left = `${e.pageX}px`;
+                sparkle.style.top = `${e.pageY}px`;
+                document.body.appendChild(sparkle);
+
+                // Remove the sparkle after animation ends
+                setTimeout(() => sparkle.remove(), 1500);
+            });
+        }
+
+        // ----- BUTTON SOUNDS -----
+        function setupButtonSounds() {
+            document.querySelectorAll('button').forEach(btn => {
+                btn.addEventListener('mouseenter', () => {
+                    hoverSound.currentTime = 0;
+                    hoverSound.play();
+                });
+                
+                btn.addEventListener('click', () => {
+                    clickSound.currentTime = 0;
+                    clickSound.play();
+                });
+            });
+        }
+    </script>
+</body>
+</html>
